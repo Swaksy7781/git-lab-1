@@ -1,0 +1,34 @@
+---
+- name: Configure app server
+  hosts: app_servers
+  become: yes
+
+  tasks:
+    # This task updates the local package cache and upgrades all packages.
+    - name: Update apt cache and upgrade packages
+      apt:
+        update_cache: yes
+        upgrade: dist
+    
+    # This task installs Java 17, as specified.
+    - name: Install Java (OpenJDK 17)
+      apt:
+        name: openjdk-17-jdk
+        state: present
+    
+    # Corrected task: The package name for Tomcat on Ubuntu is 'tomcat9'.
+    - name: Install tomcat web server
+      apt:
+        name: tomcat9
+        state: present
+      notify:
+        # The handler name now matches the service name 'tomcat9'.
+        - Start Tomcat
+
+  handlers:
+    # Corrected handler: The service name is 'tomcat9' on the server.
+    - name: Start Tomcat
+      service:
+        name: tomcat9
+        state: started
+        enabled: yes

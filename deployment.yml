@@ -1,0 +1,23 @@
+---
+- name: Deploy WAR to Tomcat App Server
+  hosts: app_servers
+  become: yes
+
+  tasks:
+    - name: Stop Tomcat service for deployment
+      systemd:
+        name: tomcat9
+        state: stopped
+        
+    - name: Copy WAR file to Tomcat webapps directory
+      copy:
+        src: target/addressbook.war
+        dest: /var/lib/tomcat9/webapps/addressbook.war
+        owner: tomcat9
+        group: tomcat9
+        mode: '0644'
+        
+    - name: Start Tomcat service
+      systemd:
+        name: tomcat9
+        state: started
